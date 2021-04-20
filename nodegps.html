@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ESP12E, Thingspeak, GPS and Google Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFCH9jeOia_PD0VzuEHiSAhhf68b8UNh4"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+      var map;
+        var x;
+        var y;
+        var a,b;
+        function loadmaps(){
+            $.getJSON("https://api.thingspeak.com/channels/1362129/fields/1/last.json?api_key=PH5YPOOXFSETN5S3", function(result){
+        	  
+            var m = result;
+            //node 1 latitude
+            x=Number(m.field1);
+            console.log(x);
+                           //alert(x);
+
+        });
+          $.getJSON("https://api.thingspeak.com/channels/1364841/fields/1/last.json?api_key=T74U2ZK2O7D8866I", function(result){
+            
+            var m = result;
+            console.log(m);
+            a=Number(m.field1);
+            //node2 latitude
+            console.log(a);
+                           //alert(x);
+
+        });
+
+            $.getJSON("https://api.thingspeak.com/channels/1362129/fields/2/last.json?api_key=PH5YPOOXFSETN5S3", function(result){
+        	
+            var m = result;
+            console.log(m);
+            y=Number(m.field2);
+            //node1 longitude
+            console.log(y);
+            });
+
+              $.getJSON("https://api.thingspeak.com/channels/1364841/fields/2/last.json?api_key=T74U2ZK2O7D8866I", function(result){
+          
+            var m = result;
+            console.log(m);
+            b=Number(m.field2);
+            //node2 longitude
+            // console.log(arr);
+           console.log(b);
+                
+        })
+            // console.log(arr);
+           
+                
+        .done(function() {
+      
+                initialize();
+    });
+            
+        }   
+        window.setInterval(function(){
+        loadmaps();
+            }, 10000);
+      function initialize() {
+          //alert(y);
+        //node1 map object
+        var mapOptions = {
+          zoom: 6,
+          center: {lat: x, lng: y}
+        };
+        //node2 map object
+        var mapOptions1 = {
+            zoom: 6,
+            center: {lat: a, lng: b}
+        }
+        //map object
+        map = new google.maps.Map(document.getElementById('map'),
+            mapOptions,mapOptions1);
+
+        //node1 marker
+        var marker = new google.maps.Marker({
+          position: {lat: x, lng: y},
+          map: map
+        });
+
+       //node2 marker
+        var marker1 = new google.maps.Marker({
+          position: {lat: a, lng: b},
+          map: map
+        });
+
+        var infowindow = new google.maps.InfoWindow({
+          content: '<p>Marker Location:' + marker.getPosition() + '</p>'
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.open(map, marker);
+        });
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+</html>
